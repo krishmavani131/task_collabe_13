@@ -10,12 +10,15 @@ import { isValidObjectId } from 'mongoose';
  * @throws {Error} Throws an error if the ObjectId is invalid.
  */
 
-function checkObjectId(req, res, next) {
-  if (!isValidObjectId(req.params.id)) {
+const checkObjectId = (req, res, next) => {
+  const { id } = req.params;
+
+  if (!isValidObjectId(id)) {
     res.status(404);
-    throw new Error(`Invalid ObjectId of:  ${req.params.id}`);
+    throw new Error(`Invalid ObjectId of:  ${id}`);
   }
+
   next();
-}
+};
 
 export default checkObjectId;
