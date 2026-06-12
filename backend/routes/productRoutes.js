@@ -1,5 +1,4 @@
 import express from 'express';
-const router = express.Router();
 import {
   getProducts,
   getProductById,
@@ -12,9 +11,19 @@ import {
 import { protect, admin } from '../middleware/authMiddleware.js';
 import checkObjectId from '../middleware/checkObjectId.js';
 
-router.route('/').get(getProducts).post(protect, admin, createProduct);
-router.route('/:id/reviews').post(protect, checkObjectId, createProductReview);
+const router = express.Router();
+
 router.get('/top', getTopProducts);
+
+router
+  .route('/')
+  .get(getProducts)
+  .post(protect, admin, createProduct);
+
+router
+  .route('/:id/reviews')
+  .post(protect, checkObjectId, createProductReview);
+
 router
   .route('/:id')
   .get(checkObjectId, getProductById)
