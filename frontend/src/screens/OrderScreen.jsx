@@ -1,11 +1,25 @@
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Row, Col, ListGroup, Image, Card, Button } from 'react-bootstrap';
-import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
+import {
+  Row,
+  Col,
+  ListGroup,
+  Image,
+  Card,
+  Button,
+  Badge,
+} from 'react-bootstrap';
+import {
+  PayPalButtons,
+  usePayPalScriptReducer,
+} from '@paypal/react-paypal-js';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+
 import Message from '../components/Message';
 import Loader from '../components/Loader';
+import CheckoutSteps from '../components/CheckoutSteps';
+
 import {
   useDeliverOrderMutation,
   useGetOrderDetailsQuery,
@@ -23,14 +37,18 @@ const OrderScreen = () => {
     error,
   } = useGetOrderDetailsQuery(orderId);
 
-  const [payOrder, { isLoading: loadingPay }] = usePayOrderMutation();
+  const [payOrder, { isLoading: loadingPay }] =
+    usePayOrderMutation();
 
   const [deliverOrder, { isLoading: loadingDeliver }] =
     useDeliverOrderMutation();
 
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector(
+    (state) => state.auth
+  );
 
-  const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
+  const [{ isPending }, paypalDispatch] =
+    usePayPalScriptReducer();
 
   const {
     data: paypal,
@@ -39,7 +57,11 @@ const OrderScreen = () => {
   } = useGetPaypalClientIdQuery();
 
   useEffect(() => {
-    if (!errorPayPal && !loadingPayPal && paypal.clientId) {
+    if (
+      !errorPayPal &&
+      !loadingPayPal &&
+      paypal?.clientId
+    ) {
       const loadPaypalScript = async () => {
         paypalDispatch({
           type: 'resetOptions',
@@ -48,35 +70,47 @@ const OrderScreen = () => {
             currency: 'USD',
           },
         });
-        paypalDispatch({ type: 'setLoadingStatus', value: 'pending' });
+
+        paypalDispatch({
+          type: 'setLoadingStatus',
+          value: 'pending',
+        });
       };
+
       if (order && !order.isPaid) {
         if (!window.paypal) {
           loadPaypalScript();
         }
       }
     }
-  }, [errorPayPal, loadingPayPal, order, paypal, paypalDispatch]);
+  }, [
+    errorPayPal,
+    loadingPayPal,
+    order,
+    paypal,
+    paypalDispatch,
+  ]);
 
   function onApprove(data, actions) {
-    return actions.order.capture().then(async function (details) {
-      try {
-        await payOrder({ orderId, details });
-        refetch();
-        toast.success('Order is paid');
-      } catch (err) {
-        toast.error(err?.data?.message || err.error);
-      }
-    });
+    return actions.order
+      .capture()
+      .then(async function (details) {
+        try {
+          await payOrder({
+            orderId,
+            details,
+          });
+
+          refetch();
+
+          toast.success('Order Paid Successfully');
+        } catch (err) {
+          toast.error(
+            err?.data?.message || err.error
+          );
+        }
+      });
   }
-
-  // TESTING ONLY! REMOVE BEFORE PRODUCTION
-  // async function onApproveTest() {
-  //   await payOrder({ orderId, details: { payer: {} } });
-  //   refetch();
-
-  //   toast.success('Order is paid');
-  // }
 
   function onError(err) {
     toast.error(err.message);
@@ -87,156 +121,262 @@ const OrderScreen = () => {
       .create({
         purchase_units: [
           {
-            amount: { value: order.totalPrice },
+            amount: {
+              value: order.totalPrice,
+            },
           },
         ],
       })
-      .then((orderID) => {
-        return orderID;
-      });
+      .then((orderID) => orderID);
   }
 
   const deliverHandler = async () => {
     await deliverOrder(orderId);
     refetch();
+    toast.success('Order Delivered');
   };
 
-  return isLoading ? (
-    <Loader />
-  ) : error ? (
-    <Message variant='danger'>{error.data.message}</Message>
-  ) : (
-    <>
-      <h1>Order {order._id}</h1>
-      <Row>
-        <Col md={8}>
-          <ListGroup variant='flush'>
-            <ListGroup.Item>
-              <h2>Shipping</h2>
+  if (isLoading) return <Loader />;
+
+  if (error)
+    return (
+      <Message variant='danger'>
+        {error?.data?.message}
+      </Message>
+    );
+
+  return (
+    <div
+      style={{
+        maxWidth: '1300px',
+        margin: '30px auto',
+      }}
+    >
+      <h1
+        className='mb-4 fw-bold'
+        style={{
+          fontSize: '2rem',
+        }}
+      >
+        Order Details
+      </h1>
+
+      <CheckoutSteps
+        step1
+        step2
+        step3
+        step4
+      />
+
+      <Row className='g-4 mt-2'>
+        {/* LEFT */}
+        <Col lg={8}>
+          {/* Shipping */}
+          <Card
+            className='border-0 shadow-sm mb-4'
+            style={{
+              borderRadius: '20px',
+            }}
+          >
+            <Card.Body className='p-4'>
+              <h4 className='fw-bold mb-3'>
+                🚚 Shipping Information
+              </h4>
+
               <p>
-                <strong>Name: </strong> {order.user.name}
+                <strong>Name:</strong>{' '}
+                {order.user.name}
               </p>
+
               <p>
-                <strong>Email: </strong>{' '}
-                <a href={`mailto:${order.user.email}`}>{order.user.email}</a>
+                <strong>Email:</strong>{' '}
+                <a
+                  href={`mailto:${order.user.email}`}
+                >
+                  {order.user.email}
+                </a>
               </p>
+
               <p>
-                <strong>Address:</strong>
-                {order.shippingAddress.address}, {order.shippingAddress.city}{' '}
+                <strong>Address:</strong>{' '}
+                {order.shippingAddress.address},{' '}
+                {order.shippingAddress.city},{' '}
                 {order.shippingAddress.postalCode},{' '}
                 {order.shippingAddress.country}
               </p>
-              {order.isDelivered ? (
-                <Message variant='success'>
-                  Delivered on {order.deliveredAt}
-                </Message>
-              ) : (
-                <Message variant='danger'>Not Delivered</Message>
-              )}
-            </ListGroup.Item>
 
-            <ListGroup.Item>
-              <h2>Payment Method</h2>
+              {order.isDelivered ? (
+                <Badge bg='success' className='p-2'>
+                  Delivered on {order.deliveredAt}
+                </Badge>
+              ) : (
+                <Badge bg='danger' className='p-2'>
+                  Not Delivered
+                </Badge>
+              )}
+            </Card.Body>
+          </Card>
+
+          {/* Payment */}
+          <Card
+            className='border-0 shadow-sm mb-4'
+            style={{
+              borderRadius: '20px',
+            }}
+          >
+            <Card.Body className='p-4'>
+              <h4 className='fw-bold mb-3'>
+                💳 Payment Information
+              </h4>
+
               <p>
-                <strong>Method: </strong>
+                <strong>Method:</strong>{' '}
                 {order.paymentMethod}
               </p>
-              {order.isPaid ? (
-                <Message variant='success'>Paid on {order.paidAt}</Message>
-              ) : (
-                <Message variant='danger'>Not Paid</Message>
-              )}
-            </ListGroup.Item>
 
-            <ListGroup.Item>
-              <h2>Order Items</h2>
+              {order.isPaid ? (
+                <Badge bg='success' className='p-2'>
+                  Paid on {order.paidAt}
+                </Badge>
+              ) : (
+                <Badge bg='warning' text='dark'>
+                  Payment Pending
+                </Badge>
+              )}
+            </Card.Body>
+          </Card>
+
+          {/* Items */}
+          <Card
+            className='border-0 shadow-sm'
+            style={{
+              borderRadius: '20px',
+            }}
+          >
+            <Card.Body className='p-4'>
+              <h4 className='fw-bold mb-4'>
+                🛍️ Order Items
+              </h4>
+
               {order.orderItems.length === 0 ? (
-                <Message>Order is empty</Message>
+                <Message>
+                  No items found.
+                </Message>
               ) : (
                 <ListGroup variant='flush'>
-                  {order.orderItems.map((item, index) => (
-                    <ListGroup.Item key={index}>
-                      <Row>
-                        <Col md={1}>
-                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            fluid
-                            rounded
-                          />
-                        </Col>
-                        <Col>
-                          <Link to={`/product/${item.product}`}>
-                            {item.name}
-                          </Link>
-                        </Col>
-                        <Col md={4}>
-                          {item.qty} x ${item.price} = ${item.qty * item.price}
-                        </Col>
-                      </Row>
-                    </ListGroup.Item>
-                  ))}
+                  {order.orderItems.map(
+                    (item, index) => (
+                      <ListGroup.Item
+                        key={index}
+                        className='py-3'
+                      >
+                        <Row className='align-items-center'>
+                          <Col md={2}>
+                            <Image
+                              src={item.image}
+                              alt={item.name}
+                              fluid
+                              rounded
+                              style={{
+                                maxHeight: '80px',
+                                objectFit: 'cover',
+                              }}
+                            />
+                          </Col>
+
+                          <Col md={6}>
+                            <Link
+                              to={`/product/${item.product}`}
+                              className='fw-semibold text-decoration-none'
+                            >
+                              {item.name}
+                            </Link>
+                          </Col>
+
+                          <Col
+                            md={4}
+                            className='text-end fw-bold'
+                          >
+                            {item.qty} × $
+                            {item.price} = $
+                            {(
+                              item.qty *
+                              item.price
+                            ).toFixed(2)}
+                          </Col>
+                        </Row>
+                      </ListGroup.Item>
+                    )
+                  )}
                 </ListGroup>
               )}
-            </ListGroup.Item>
-          </ListGroup>
+            </Card.Body>
+          </Card>
         </Col>
-        <Col md={4}>
-          <Card>
-            <ListGroup variant='flush'>
-              <ListGroup.Item>
-                <h2>Order Summary</h2>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row>
-                  <Col>Items</Col>
-                  <Col>${order.itemsPrice}</Col>
-                </Row>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row>
-                  <Col>Shipping</Col>
-                  <Col>${order.shippingPrice}</Col>
-                </Row>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row>
-                  <Col>Tax</Col>
-                  <Col>${order.taxPrice}</Col>
-                </Row>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row>
-                  <Col>Total</Col>
-                  <Col>${order.totalPrice}</Col>
-                </Row>
-              </ListGroup.Item>
+
+        {/* RIGHT */}
+        <Col lg={4}>
+          <Card
+            className='border-0 shadow-lg'
+            style={{
+              borderRadius: '20px',
+              position: 'sticky',
+              top: '20px',
+            }}
+          >
+            <Card.Body className='p-4'>
+              <h4 className='fw-bold mb-4'>
+                Order Summary
+              </h4>
+
+              <div className='d-flex justify-content-between mb-3'>
+                <span>Items</span>
+                <strong>
+                  ${order.itemsPrice}
+                </strong>
+              </div>
+
+              <div className='d-flex justify-content-between mb-3'>
+                <span>Shipping</span>
+                <strong>
+                  ${order.shippingPrice}
+                </strong>
+              </div>
+
+              <div className='d-flex justify-content-between mb-3'>
+                <span>Tax</span>
+                <strong>
+                  ${order.taxPrice}
+                </strong>
+              </div>
+
+              <hr />
+
+              <div className='d-flex justify-content-between mb-4'>
+                <h5>Total</h5>
+                <h5 className='fw-bold text-primary'>
+                  ${order.totalPrice}
+                </h5>
+              </div>
+
               {!order.isPaid && (
-                <ListGroup.Item>
+                <>
                   {loadingPay && <Loader />}
 
                   {isPending ? (
                     <Loader />
                   ) : (
-                    <div>
-                      {/* THIS BUTTON IS FOR TESTING! REMOVE BEFORE PRODUCTION! */}
-                      {/* <Button
-                        style={{ marginBottom: '10px' }}
-                        onClick={onApproveTest}
-                      >
-                        Test Pay Order
-                      </Button> */}
-
-                      <div>
-                        <PayPalButtons
-                          createOrder={createOrder}
-                          onApprove={onApprove}
-                          onError={onError}
-                        ></PayPalButtons>
-                      </div>
-                    </div>
+                    <PayPalButtons
+                      createOrder={
+                        createOrder
+                      }
+                      onApprove={
+                        onApprove
+                      }
+                      onError={onError}
+                    />
                   )}
-                </ListGroup.Item>
+                </>
               )}
 
               {loadingDeliver && <Loader />}
@@ -245,21 +385,26 @@ const OrderScreen = () => {
                 userInfo.isAdmin &&
                 order.isPaid &&
                 !order.isDelivered && (
-                  <ListGroup.Item>
-                    <Button
-                      type='button'
-                      className='btn btn-block'
-                      onClick={deliverHandler}
-                    >
-                      Mark As Delivered
-                    </Button>
-                  </ListGroup.Item>
+                  <Button
+                    className='w-100 mt-4'
+                    variant='success'
+                    size='lg'
+                    onClick={
+                      deliverHandler
+                    }
+                    style={{
+                      borderRadius:
+                        '12px',
+                    }}
+                  >
+                    Mark As Delivered
+                  </Button>
                 )}
-            </ListGroup>
+            </Card.Body>
           </Card>
         </Col>
       </Row>
-    </>
+    </div>
   );
 };
 
