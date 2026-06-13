@@ -1,60 +1,33 @@
 import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 
-const Rating = ({ value, text, color }) => {
+const Rating = ({ value, text, color = '#f8e825' }) => {
+  const renderStar = (starValue) => {
+    if (value >= starValue) {
+      return <FaStar color={color} />;
+    }
+
+    if (value >= starValue - 0.5) {
+      return <FaStarHalfAlt color={color} />;
+    }
+
+    return <FaRegStar color={color} />;
+  };
+
   return (
-    <div className='rating'>
-      <span>
-        {value >= 1 ? (
-          <FaStar />
-        ) : value >= 0.5 ? (
-          <FaStarHalfAlt />
-        ) : (
-          <FaRegStar />
-        )}
-      </span>
-      <span>
-        {value >= 2 ? (
-          <FaStar />
-        ) : value >= 1.5 ? (
-          <FaStarHalfAlt />
-        ) : (
-          <FaRegStar />
-        )}
-      </span>
-      <span>
-        {value >= 3 ? (
-          <FaStar />
-        ) : value >= 2.5 ? (
-          <FaStarHalfAlt />
-        ) : (
-          <FaRegStar />
-        )}
-      </span>
-      <span>
-        {value >= 4 ? (
-          <FaStar />
-        ) : value >= 3.5 ? (
-          <FaStarHalfAlt />
-        ) : (
-          <FaRegStar />
-        )}
-      </span>
-      <span>
-        {value >= 5 ? (
-          <FaStar />
-        ) : value >= 4.5 ? (
-          <FaStarHalfAlt />
-        ) : (
-          <FaRegStar />
-        )}
-      </span>
-      <span className='rating-text'>{text && text}</span>
+    <div className="rating">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <span key={star}>
+          {renderStar(star)}
+        </span>
+      ))}
+
+      {text && (
+        <span className="rating-text">
+          {text}
+        </span>
+      )}
     </div>
   );
-};
-
-Rating.defaultProps = {
-  color: '#f8e825',
 };
 
 export default Rating;
