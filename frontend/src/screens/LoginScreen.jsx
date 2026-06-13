@@ -1,27 +1,33 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 
 import Loader from '../components/Loader';
 import FormContainer from '../components/FormContainer';
 
 import { useLoginMutation } from '../slices/usersApiSlice';
 import { setCredentials } from '../slices/authSlice';
-import { toast } from 'react-toastify';
 
 const LoginScreen = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const location = useLocation();
 
-  const [login, { isLoading }] = useLoginMutation();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+
   const { userInfo } = useSelector((state) => state.auth);
 
-  const { search } = useLocation();
-  const redirect = new URLSearchParams(search).get('redirect') || '/';
+  const [loginUser, { isLoading }] = useLoginMutation();
+
+  const redirect = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('redirect') || '/';
+  }, [location.search]);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -30,28 +36,25 @@ const LoginScreen = () => {
     }
   }, [userInfo, navigate, redirect]);
 
-  // Submit handler
-  const submitHandler = async (e) => {
+  const handleChange = ({ target: { name, value } }) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation (important)
-    if (!email || !password) {
-      toast.error('Please fill all fields');
-      return;
-    }
-
     try {
-      const res = await login({ email, password }).unwrap();
+      const userData = await loginUser(formData).unwrap();
 
-      // Safe dispatch
-      dispatch(setCredentials(res));
+      dispatch(setCredentials(userData));
 
       navigate(redirect);
-    } catch (err) {
+    } catch (error) {
       toast.error(
-        err?.data?.message ||
-        err?.error ||
-        'Login failed'
+        error?.data?.message || 'Invalid email or password'
       );
     }
   };
@@ -60,34 +63,32 @@ const LoginScreen = () => {
     <FormContainer>
       <h1>Sign In</h1>
 
-      <Form onSubmit={submitHandler}>
-        
-        <Form.Group className="my-2" controlId="email">
+      <Form onSubmit={handleSubmit}>
+        <Form.Group controlId="email" className="mb-3">
           <Form.Label>Email Address</Form.Label>
           <Form.Control
             type="email"
+            name="email"
             placeholder="Enter email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+            value={formData.email}
+            onChange={handleChange}
           />
         </Form.Group>
 
-        <Form.Group className="my-2" controlId="password">
+        <Form.Group controlId="password" className="mb-3">
           <Form.Label>Password</Form.Label>
           <Form.Control
             type="password"
+            name="password"
             placeholder="Enter password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
+            value={formData.password}
+            onChange={handleChange}
           />
         </Form.Group>
 
         <Button
           type="submit"
           variant="primary"
-          className="mt-3 w-100"
           disabled={isLoading}
         >
           {isLoading ? 'Signing In...' : 'Sign In'}
@@ -96,10 +97,16 @@ const LoginScreen = () => {
         {isLoading && <Loader />}
       </Form>
 
-      <Row className="py-3">
+      <Row className="mt-3">
         <Col>
           New Customer?{' '}
-          <Link to={`/register?redirect=${redirect}`}>
+          <Link
+            to={
+              redirect
+                ? `/register?redirect=${redirect}`
+                : '/register'
+            }
+          >
             Register
           </Link>
         </Col>

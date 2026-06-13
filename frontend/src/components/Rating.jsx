@@ -1,30 +1,31 @@
 import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 
-// Returns the appropriate star icon for a given star position based on
-// the rating value (e.g. position 3 with value 2.5 -> half star).
-const StarIcon = ({ value, position }) => {
-  if (value >= position) {
-    return <FaStar />;
-  }
-
-  if (value >= position - 0.5) {
-    return <FaStarHalfAlt />;
-  }
-
-  return <FaRegStar />;
-};
-
-const STAR_POSITIONS = [1, 2, 3, 4, 5];
-
 const Rating = ({ value, text, color = '#f8e825' }) => {
+  const renderStar = (starValue) => {
+    if (value >= starValue) {
+      return <FaStar color={color} />;
+    }
+
+    if (value >= starValue - 0.5) {
+      return <FaStarHalfAlt color={color} />;
+    }
+
+    return <FaRegStar color={color} />;
+  };
+
   return (
-    <div className='rating'>
-      {STAR_POSITIONS.map((position) => (
-        <span key={position}>
-          <StarIcon value={value} position={position} />
+    <div className="rating">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <span key={star}>
+          {renderStar(star)}
         </span>
       ))}
-      <span className='rating-text'>{text}</span>
+
+      {text && (
+        <span className="rating-text">
+          {text}
+        </span>
+      )}
     </div>
   );
 };

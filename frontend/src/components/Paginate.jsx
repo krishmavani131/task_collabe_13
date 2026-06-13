@@ -1,43 +1,38 @@
 import { Pagination } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
-function getPageUrl(isAdmin, keyword, pageNumber) {
-  if (isAdmin) {
-    return `/admin/productlist/${pageNumber}`;
-  }
-  if (keyword) {
-    return `/search/${keyword}/page/${pageNumber}`;
-  }
-  return `/page/${pageNumber}`;
-}
+const Paginate = ({
+  pages,
+  page,
+  isAdmin = false,
+  keyword = '',
+}) => {
+  const getPageLink = (pageNumber) => {
+    if (isAdmin) {
+      return `/admin/productlist/${pageNumber}`;
+    }
 
-function Paginate({ pages, page, isAdmin = false, keyword = '' }) {
-  if (pages <= 1) {
-    return null;
-  }
+    return keyword
+      ? `/search/${keyword}/page/${pageNumber}`
+      : `/page/${pageNumber}`;
+  };
 
-  const pageNumbers = [...Array(pages).keys()];
+  if (pages <= 1) return null;
 
   return (
     <Pagination>
-      {pageNumbers.map((x) => {
-        const pageNumber = x + 1;
-        const url = getPageUrl(isAdmin, keyword, pageNumber);
-        const isActive = pageNumber === page;
-
-        return (
-          <Pagination.Item
-            as={Link}
-            key={pageNumber}
-            to={url}
-            active={isActive}
-          >
-            {pageNumber}
-          </Pagination.Item>
-        );
-      })}
+      {Array.from({ length: pages }, (_, index) => (
+        <Pagination.Item
+          key={index + 1}
+          as={Link}
+          to={getPageLink(index + 1)}
+          active={page === index + 1}
+        >
+          {index + 1}
+        </Pagination.Item>
+      ))}
     </Pagination>
   );
-}
+};
 
 export default Paginate;
