@@ -1,64 +1,74 @@
-import { apiSlice } from './apiSlice';
-import { USERS_URL } from '../constants';
+import { apiSlice } from "./apiSlice";
+import { USERS_URL } from "../constants";
 
 export const userApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+
     login: builder.mutation({
-      query: (data) => ({
+      query: (credentials) => ({
         url: `${USERS_URL}/auth`,
-        method: 'POST',
-        body: data,
+        method: "POST",
+        body: credentials,
       }),
     }),
+
     register: builder.mutation({
-      query: (data) => ({
-        url: `${USERS_URL}`,
-        method: 'POST',
-        body: data,
+      query: (userData) => ({
+        url: USERS_URL,
+        method: "POST",
+        body: userData,
       }),
     }),
+
     logout: builder.mutation({
       query: () => ({
         url: `${USERS_URL}/logout`,
-        method: 'POST',
+        method: "POST",
       }),
     }),
+
     profile: builder.mutation({
-      query: (data) => ({
+      query: (profileData) => ({
         url: `${USERS_URL}/profile`,
-        method: 'PUT',
-        body: data,
+        method: "PUT",
+        body: profileData,
       }),
     }),
+
     getUsers: builder.query({
-      query: () => ({
-        url: USERS_URL,
-      }),
-      providesTags: ['User'],
+      query: () => USERS_URL,
       keepUnusedDataFor: 5,
+      providesTags: ["User"],
     }),
+
     deleteUser: builder.mutation({
-      query: (userId) => ({
-        url: `${USERS_URL}/${userId}`,
-        method: 'DELETE',
+      query: (id) => ({
+        url: `${USERS_URL}/${id}`,
+        method: "DELETE",
       }),
+      invalidatesTags: ["User"],
     }),
+
     getUserDetails: builder.query({
       query: (id) => ({
         url: `${USERS_URL}/${id}`,
       }),
       keepUnusedDataFor: 5,
+      providesTags: ["User"],
     }),
+
     updateUser: builder.mutation({
-      query: (data) => ({
-        url: `${USERS_URL}/${data.userId}`,
-        method: 'PUT',
-        body: data,
+      query: (user) => ({
+        url: `${USERS_URL}/${user.userId}`,
+        method: "PUT",
+        body: user,
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ["User"],
     }),
+
   }),
 });
+
 
 export const {
   useLoginMutation,
