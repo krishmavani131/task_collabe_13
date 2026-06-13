@@ -1,32 +1,18 @@
-main {
-  min-height: 80vh;
+:root {
+  --star-color: #f8e825;
+  --review-bg: #f4f4f4;
+  --review-border: #ddd;
+  --carousel-overlay: rgba(0, 0, 0, 0.5);
 }
 
-.rating span {
-  margin: 0.1rem;
+
+.carousel-caption {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  background: var(--carousel-overlay);
 }
 
-.rating svg {
-  color: #f8e825;
-}
-
-.rating-text {
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding-left: 0.5rem;
-}
-
-.product-title {
-  height: 2.5em; /* Set a fixed height */
-  overflow: hidden; /* Hide overflow content */
-  text-overflow: ellipsis; /* Add ellipsis for long text */
-  white-space: nowrap; /* Prevent wrapping */
-}
-
-table td,
-table th {
-  text-align: center;
-}
 
 .review {
   margin-top: 30px;
@@ -34,20 +20,45 @@ table th {
 
 .review h2 {
   font-size: 24px;
-  background: #f4f4f4;
+  background: var(--review-bg);
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--review-border);
 }
 
 .review button {
   margin-top: 10px;
 }
 
-.carousel-caption {
-  position: absolute;
-  width: 100%;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+/* ---------- Tables ---------- */
+table th,
+table td {
+  text-align: center;
+}
+
+/* ---------- Product card ---------- */
+.product-title {
+  height: 2.5em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- Star rating ---------- */
+.rating-text {
+  padding-left: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.rating svg {
+  color: var(--star-color);
+}
+
+.rating span {
+  margin: 0.1rem;
+}
+
+/* ---------- Page layout ---------- */
+main {
+  min-height: 80vh;
 }

@@ -1,60 +1,32 @@
 import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 
-const Rating = ({ value, text, color }) => {
-  return (
-    <div className='rating'>
-      <span>
-        {value >= 1 ? (
-          <FaStar />
-        ) : value >= 0.5 ? (
-          <FaStarHalfAlt />
-        ) : (
-          <FaRegStar />
-        )}
-      </span>
-      <span>
-        {value >= 2 ? (
-          <FaStar />
-        ) : value >= 1.5 ? (
-          <FaStarHalfAlt />
-        ) : (
-          <FaRegStar />
-        )}
-      </span>
-      <span>
-        {value >= 3 ? (
-          <FaStar />
-        ) : value >= 2.5 ? (
-          <FaStarHalfAlt />
-        ) : (
-          <FaRegStar />
-        )}
-      </span>
-      <span>
-        {value >= 4 ? (
-          <FaStar />
-        ) : value >= 3.5 ? (
-          <FaStarHalfAlt />
-        ) : (
-          <FaRegStar />
-        )}
-      </span>
-      <span>
-        {value >= 5 ? (
-          <FaStar />
-        ) : value >= 4.5 ? (
-          <FaStarHalfAlt />
-        ) : (
-          <FaRegStar />
-        )}
-      </span>
-      <span className='rating-text'>{text && text}</span>
-    </div>
-  );
+// Returns the appropriate star icon for a given star position based on
+// the rating value (e.g. position 3 with value 2.5 -> half star).
+const StarIcon = ({ value, position }) => {
+  if (value >= position) {
+    return <FaStar />;
+  }
+
+  if (value >= position - 0.5) {
+    return <FaStarHalfAlt />;
+  }
+
+  return <FaRegStar />;
 };
 
-Rating.defaultProps = {
-  color: '#f8e825',
+const STAR_POSITIONS = [1, 2, 3, 4, 5];
+
+const Rating = ({ value, text, color = '#f8e825' }) => {
+  return (
+    <div className='rating'>
+      {STAR_POSITIONS.map((position) => (
+        <span key={position}>
+          <StarIcon value={value} position={position} />
+        </span>
+      ))}
+      <span className='rating-text'>{text}</span>
+    </div>
+  );
 };
 
 export default Rating;

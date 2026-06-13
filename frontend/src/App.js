@@ -5,22 +5,26 @@ import { Outlet } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { logout } from './slices/authSlice';
-
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const App = () => {
+function checkSessionExpiry(dispatch) {
+  const expirationTime = localStorage.getItem('expirationTime');
+  if (!expirationTime) return;
+
+  const currentTime = new Date().getTime();
+  const hasExpired = currentTime > Number(expirationTime);
+
+  if (hasExpired) {
+    dispatch(logout());
+  }
+}
+
+function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const expirationTime = localStorage.getItem('expirationTime');
-    if (expirationTime) {
-      const currentTime = new Date().getTime();
-
-      if (currentTime > expirationTime) {
-        dispatch(logout());
-      }
-    }
+    checkSessionExpiry(dispatch);
   }, [dispatch]);
 
   return (
@@ -35,6 +39,6 @@ const App = () => {
       <Footer />
     </>
   );
-};
+}
 
 export default App;

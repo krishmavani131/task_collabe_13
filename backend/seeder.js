@@ -17,47 +17,43 @@ connectDB();
 
 const importData = async () => {
   try {
-    await Promise.all([
-      Order.deleteMany(),
-      Product.deleteMany(),
-      User.deleteMany(),
-    ]);
+    await Order.deleteMany({});
+    await Product.deleteMany({});
+    await User.deleteMany({});
 
-    const createdUsers = await User.insertMany(users);
+    const insertedUsers = await User.insertMany(users);
 
-    const adminUser = createdUsers[0]._id;
+    const adminId = insertedUsers[0]._id;
 
-    const sampleProducts = products.map((product) => ({
-      ...product,
-      user: adminUser,
+    const productData = products.map((item) => ({
+      ...item,
+      user: adminId,
     }));
 
-    await Product.insertMany(sampleProducts);
+    await Product.insertMany(productData);
 
-    console.log('Data Imported!'.green.inverse);
-
+    console.log('Data Imported Successfully!'.green.inverse);
     process.exit(0);
-  } catch (error) {
-    console.error(`${error}`.red.inverse);
+  } catch (err) {
+    console.error(`${err}`.red.inverse);
     process.exit(1);
   }
 };
 
 const destroyData = async () => {
   try {
-    await Promise.all([
-      Order.deleteMany(),
-      Product.deleteMany(),
-      User.deleteMany(),
-    ]);
+    await Order.deleteMany({});
+    await Product.deleteMany({});
+    await User.deleteMany({});
 
-    console.log('Data Destroyed!'.red.inverse);
-
+    console.log('Data Removed Successfully!'.red.inverse);
     process.exit(0);
-  } catch (error) {
-    console.error(`${error}`.red.inverse);
+  } catch (err) {
+    console.error(`${err}`.red.inverse);
     process.exit(1);
   }
 };
 
-process.argv[2] === '-d' ? destroyData() : importData();
+const action = process.argv[2];
+
+action === '-d' ? destroyData() : importData();
