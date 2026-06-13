@@ -1,28 +1,40 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
+
+const loadUser = () => {
+  const storedUser = localStorage.getItem("userInfo");
+
+  return storedUser ? JSON.parse(storedUser) : null;
+};
 
 const initialState = {
-  userInfo: localStorage.getItem('userInfo')
-    ? JSON.parse(localStorage.getItem('userInfo'))
-    : null,
+  userInfo: loadUser(),
 };
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
+
   initialState,
+
   reducers: {
     setCredentials: (state, action) => {
-      state.userInfo = action.payload;
-      localStorage.setItem('userInfo', JSON.stringify(action.payload));
+      const user = action.payload;
+
+      state.userInfo = user;
+      localStorage.setItem("userInfo", JSON.stringify(user));
     },
-    logout: (state, action) => {
+
+    logout: (state) => {
       state.userInfo = null;
-      // NOTE: here we need to also remove the cart from storage so the next
-      // logged in user doesn't inherit the previous users cart and shipping
-      localStorage.clear();
+
+      localStorage.removeItem("userInfo");
+      localStorage.removeItem("cart");
     },
   },
 });
 
-export const { setCredentials, logout } = authSlice.actions;
+export const {
+  setCredentials,
+  logout,
+} = authSlice.actions;
 
 export default authSlice.reducer;
