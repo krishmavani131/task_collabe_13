@@ -2,50 +2,40 @@ import React from 'react';
 import { Nav } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
-const CheckoutSteps = ({ step1, step2, step3, step4 }) => {
+const steps = [
+  { label: 'Sign In', path: '/login' },
+  { label: 'Shipping', path: '/shipping' },
+  { label: 'Payment', path: '/payment' },
+  { label: 'Place Order', path: '/placeorder' },
+];
+
+function StepLink({ isActive, path, label }) {
+  if (isActive) {
+    return (
+      <Nav.Link as={Link} to={path}>
+        {label}
+      </Nav.Link>
+    );
+  }
+  return <Nav.Link disabled>{label}</Nav.Link>;
+}
+
+function CheckoutSteps({ step1, step2, step3, step4 }) {
+  const stepFlags = [step1, step2, step3, step4];
+
   return (
     <Nav className='justify-content-center mb-4'>
-      <Nav.Item>
-        {step1 ? (
-          <Nav.Link as={Link} to='/login'>
-            Sign In
-          </Nav.Link>
-        ) : (
-          <Nav.Link disabled>Sign In</Nav.Link>
-        )}
-      </Nav.Item>
-
-      <Nav.Item>
-        {step2 ? (
-          <Nav.Link as={Link} to='/shipping'>
-            Shipping
-          </Nav.Link>
-        ) : (
-          <Nav.Link disabled>Shipping</Nav.Link>
-        )}
-      </Nav.Item>
-
-      <Nav.Item>
-        {step3 ? (
-          <Nav.Link as={Link} to='/payment'>
-            Payment
-          </Nav.Link>
-        ) : (
-          <Nav.Link disabled>Payment</Nav.Link>
-        )}
-      </Nav.Item>
-
-      <Nav.Item>
-        {step4 ? (
-          <Nav.Link as={Link} to='/placeorder'>
-            Place Order
-          </Nav.Link>
-        ) : (
-          <Nav.Link disabled>Place Order</Nav.Link>
-        )}
-      </Nav.Item>
+      {steps.map((step, index) => (
+        <Nav.Item key={step.path}>
+          <StepLink
+            isActive={stepFlags[index]}
+            path={step.path}
+            label={step.label}
+          />
+        </Nav.Item>
+      ))}
     </Nav>
   );
-};
+}
 
 export default CheckoutSteps;
