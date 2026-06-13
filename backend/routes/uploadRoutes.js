@@ -39,9 +39,12 @@ router.post('/', (req, res) => {
       return res.status(400).send({ message: err.message });
     }
 
+    // Normalize Windows backslashes to forward slashes for browser URLs
+    const filePath = req.file && req.file.path ? req.file.path.replace(/\\/g, '/') : '';
+
     res.status(200).send({
       message: 'Image uploaded successfully',
-      image: `/${req.file.path}`,
+      image: `/${filePath}`,
     });
   });
 });
