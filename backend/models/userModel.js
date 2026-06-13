@@ -3,19 +3,28 @@ import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema(
   {
-    name: String,
+    name: {
+      type: String,
+      required: true,
+    },
     email: {
       type: String,
       required: true,
       unique: true,
     },
-    password: String,
+    password: {
+      type: String,
+      required: true,
+    },
     isAdmin: {
       type: Boolean,
+      required: true,
       default: false,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
 userSchema.methods.matchPassword = async function (enteredPassword) {
@@ -33,4 +42,6 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-export default model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+
+export default User;

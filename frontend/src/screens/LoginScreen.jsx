@@ -29,7 +29,6 @@ const LoginScreen = () => {
     return params.get('redirect') || '/';
   }, [location.search]);
 
-  // Redirect if already logged in
   useEffect(() => {
     if (userInfo) {
       navigate(redirect);

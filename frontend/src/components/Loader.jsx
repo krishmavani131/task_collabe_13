@@ -15,6 +15,4 @@ const Loader = () => {
   );
 };
 
-const Loader = () => <Spinner animation='border' role='status' style={loaderStyle} />;
-
 export default Loader;

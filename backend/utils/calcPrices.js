@@ -9,7 +9,7 @@ const addDecimals = (num) => {
 
 export function calcPrices(orderItems) {
   const itemsPrice = orderItems.reduce(
-    (total, product) => total + (product.price * 100 * product.qty) / 100,
+    (acc, item) => acc + (item.price * 100 * item.qty) / 100,
     0
   );
 
@@ -21,9 +21,9 @@ export function calcPrices(orderItems) {
   const totalPrice = itemsPrice + shippingPrice + taxPrice;
 
   return {
-    itemsPrice: formatPrice(itemsPrice),
-    shippingPrice: formatPrice(shippingPrice),
-    taxPrice: formatPrice(taxPrice),
-    totalPrice: formatPrice(totalPrice),
+    itemsPrice: addDecimals(itemsPrice),
+    shippingPrice: addDecimals(shippingPrice),
+    taxPrice: addDecimals(taxPrice),
+    totalPrice: addDecimals(totalPrice),
   };
-};
+}

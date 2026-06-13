@@ -46,12 +46,6 @@ const CartScreen = () => {
     navigate('/login?redirect=/shipping');
   };
 
-  // Calculations (safe)
-  const totalItems = cartItems.reduce((acc, item) => acc + item.qty, 0);
-  const totalPrice = cartItems
-    .reduce((acc, item) => acc + item.qty * item.price, 0)
-    .toFixed(2);
-
   return (
     <Row>
       {/* Cart Items */}
@@ -165,7 +159,6 @@ const CartScreen = () => {
                 Proceed To Checkout
               </Button>
             </ListGroup.Item>
-
           </ListGroup>
         </Card>
       </Col>
