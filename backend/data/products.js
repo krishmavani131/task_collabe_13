@@ -1,9 +1,9 @@
 const products = [
   {
-    name: 'Airpods Wireless Bluetooth Headphones',
+    name: 'AirPods Wireless Bluetooth Headphones',
     image: '/images/airpods.jpg',
     description:
-      'Bluetooth technology lets you connect it with compatible devices wirelessly High-quality AAC audio offers immersive listening experience Built-in microphone allows you to take calls while working',
+      'Bluetooth technology enables wireless connectivity with compatible devices. High-quality AAC audio provides an immersive listening experience, and the built-in microphone supports hands-free calls.',
     brand: 'Apple',
     category: 'Electronics',
     price: 89.99,
@@ -12,10 +12,10 @@ const products = [
     numReviews: 12,
   },
   {
-    name: 'iPhone 13 Pro 256GB Memory',
+    name: 'iPhone 13 Pro 256GB',
     image: '/images/phone.jpg',
     description:
-      'Introducing the iPhone 13 Pro. A transformative triple-camera system that adds tons of capability without complexity. An unprecedented leap in battery life',
+      'The iPhone 13 Pro features a powerful triple-camera system and improved battery life, delivering exceptional performance and photography capabilities.',
     brand: 'Apple',
     category: 'Electronics',
     price: 599.99,
@@ -24,11 +24,11 @@ const products = [
     numReviews: 8,
   },
   {
-    name: 'Cannon EOS 80D DSLR Camera',
+    name: 'Canon EOS 80D DSLR Camera',
     image: '/images/camera.jpg',
     description:
-      'Characterized by versatile imaging specs, the Canon EOS 80D further clarifies itself using a pair of robust focusing systems and an intuitive design',
-    brand: 'Cannon',
+      'The Canon EOS 80D combines versatile imaging features with advanced autofocus systems and an intuitive design for photographers of all levels.',
+    brand: 'Canon',
     category: 'Electronics',
     price: 929.99,
     countInStock: 5,
@@ -36,10 +36,10 @@ const products = [
     numReviews: 12,
   },
   {
-    name: 'Sony Playstation 5',
+    name: 'Sony PlayStation 5 Console',
     image: '/images/playstation.jpg',
     description:
-      'The ultimate home entertainment center starts with PlayStation. Whether you are into gaming, HD movies, television, music',
+      'Enjoy gaming, movies, music, and more with the PlayStation 5, designed to provide a premium entertainment experience.',
     brand: 'Sony',
     category: 'Electronics',
     price: 399.99,
@@ -51,7 +51,7 @@ const products = [
     name: 'Logitech G-Series Gaming Mouse',
     image: '/images/mouse.jpg',
     description:
-      'Get a better handle on your games with this Logitech LIGHTSYNC gaming mouse. The six programmable buttons allow customization for a smooth playing experience',
+      'This Logitech gaming mouse features customizable buttons and LIGHTSYNC technology for enhanced gaming precision and control.',
     brand: 'Logitech',
     category: 'Electronics',
     price: 49.99,
@@ -60,10 +60,10 @@ const products = [
     numReviews: 10,
   },
   {
-    name: 'Amazon Echo Dot 3rd Generation',
+    name: 'Amazon Echo Dot (3rd Gen)',
     image: '/images/alexa.jpg',
     description:
-      'Meet Echo Dot - Our most popular smart speaker with a fabric design. It is our most compact smart speaker that fits perfectly into small space',
+      'A compact smart speaker with a stylish fabric design that fits easily into small spaces while providing voice assistant functionality.',
     brand: 'Amazon',
     category: 'Electronics',
     price: 29.99,
