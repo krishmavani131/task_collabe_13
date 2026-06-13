@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -9,6 +9,8 @@ import {
   Card,
   Button,
   Form,
+  Container,
+  Badge,
 } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 
@@ -25,254 +27,439 @@ import Message from '../components/Message';
 import Meta from '../components/Meta';
 
 const ProductScreen = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+  const { id: productId } = useParams();
+
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  // ✅ Local state
   const [qty, setQty] = useState(1);
-  const [reviewData, setReviewData] = useState({
-    rating: 0,
-    comment: '',
-  });
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
 
-  // ✅ API
   const {
     data: product,
     isLoading,
-    error,
     refetch,
-  } = useGetProductDetailsQuery(id);
-
-  const [createReview, { isLoading: loadingReview }] =
-    useCreateReviewMutation();
+    error,
+  } = useGetProductDetailsQuery(productId);
 
   const { userInfo } = useSelector((state) => state.auth);
 
-  // ✅ Handlers
+  const [createReview, { isLoading: loadingProductReview }] =
+    useCreateReviewMutation();
+
   const addToCartHandler = () => {
     dispatch(addToCart({ ...product, qty }));
     navigate('/cart');
   };
 
-  const submitReviewHandler = async (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
 
     try {
       await createReview({
-        productId: id,
-        rating: reviewData.rating,
-        comment: reviewData.comment,
+        productId,
+        rating,
+        comment,
       }).unwrap();
 
-      toast.success('Review Added');
-      setReviewData({ rating: 0, comment: '' });
       refetch();
+
+      setRating(0);
+      setComment('');
+
+      toast.success('Review created successfully');
     } catch (err) {
-      toast.error(err?.data?.message || err.message);
+      toast.error(err?.data?.message || err.error);
     }
   };
 
-  // ✅ Qty options
-  const renderQtyOptions = () =>
-    [...Array(product.countInStock).keys()].map((x) => (
-      <option key={x + 1} value={x + 1}>
-        {x + 1}
-      </option>
-    ));
-
-  // ✅ Reviews list
-  const renderReviews = () =>
-    product.reviews.map((rev) => (
-      <ListGroup.Item key={rev._id}>
-        <strong>{rev.name}</strong>
-        <Rating value={rev.rating} />
-        <p>{rev.createdAt?.substring(0, 10)}</p>
-        <p>{rev.comment}</p>
-      </ListGroup.Item>
-    ));
-
   return (
     <>
-      <Link to='/' className='btn btn-light my-3'>
-        Go Back
-      </Link>
+      <Meta title={product?.name} description={product?.description} />
 
-      {isLoading ? (
-        <Loader />
-      ) : error ? (
-        <Message variant='danger'>
-          {error?.data?.message || error.error}
-        </Message>
-      ) : (
-        <>
-          <Meta title={product.name} description={product.description} />
+      <style>{`
+        .product-page {
+          background: #f8fafc;
+          min-height: 100vh;
+          padding-bottom: 50px;
+        }
 
-          <Row>
-            {/* IMAGE */}
-            <Col md={6}>
-              <Image src={product.image} alt={product.name} fluid />
-            </Col>
+        .back-btn {
+          border-radius: 50px;
+          padding: 10px 25px;
+          font-weight: 600;
+          border: none;
+          box-shadow: 0 5px 15px rgba(0,0,0,.08);
+        }
 
-            {/* DETAILS */}
-            <Col md={3}>
-              <ListGroup variant='flush'>
-                <ListGroup.Item>
-                  <h3>{product.name}</h3>
-                </ListGroup.Item>
+        .image-card {
+          background: white;
+          border-radius: 24px;
+          padding: 30px;
+          box-shadow: 0 15px 35px rgba(0,0,0,.08);
+          overflow: hidden;
+        }
 
-                <ListGroup.Item>
-                  <Rating
-                    value={product.rating}
-                    text={`${product.numReviews} reviews`}
-                  />
-                </ListGroup.Item>
+        .product-image {
+          width: 100%;
+          transition: .4s ease;
+        }
 
-                <ListGroup.Item>
-                  Price: ${product.price}
-                </ListGroup.Item>
+        .product-image:hover {
+          transform: scale(1.05);
+        }
 
-                <ListGroup.Item>
-                  {product.description}
-                </ListGroup.Item>
-              </ListGroup>
-            </Col>
+        .info-card {
+          background: white;
+          border-radius: 24px;
+          padding: 30px;
+          box-shadow: 0 15px 35px rgba(0,0,0,.08);
+          height: 100%;
+        }
 
-            {/* BUY CARD */}
-            <Col md={3}>
-              <Card>
-                <ListGroup variant='flush'>
+        .product-title {
+          font-size: 2.2rem;
+          font-weight: 800;
+          color: #0f172a;
+          margin-bottom: 15px;
+        }
 
-                  <ListGroup.Item>
-                    <Row>
-                      <Col>Price</Col>
-                      <Col>
-                        <strong>${product.price}</strong>
-                      </Col>
-                    </Row>
-                  </ListGroup.Item>
+        .price-tag {
+          font-size: 2rem;
+          font-weight: 800;
+          color: #2563eb;
+          margin: 15px 0;
+        }
 
-                  <ListGroup.Item>
-                    <Row>
-                      <Col>Status</Col>
-                      <Col>
-                        {product.countInStock > 0
-                          ? 'In Stock'
-                          : 'Out Of Stock'}
-                      </Col>
-                    </Row>
-                  </ListGroup.Item>
+        .description {
+          color: #64748b;
+          line-height: 1.8;
+          margin-top: 15px;
+        }
 
-                  {product.countInStock > 0 && (
-                    <ListGroup.Item>
-                      <Row>
-                        <Col>Qty</Col>
-                        <Col>
-                          <Form.Select
-                            value={qty}
-                            onChange={(e) =>
-                              setQty(Number(e.target.value))
-                            }
-                          >
-                            {renderQtyOptions()}
-                          </Form.Select>
-                        </Col>
-                      </Row>
-                    </ListGroup.Item>
-                  )}
+        .purchase-card {
+          border: none;
+          border-radius: 24px;
+          box-shadow: 0 15px 35px rgba(0,0,0,.08);
+          position: sticky;
+          top: 100px;
+        }
 
-                  <ListGroup.Item>
-                    <Button
-                      className='w-100'
-                      disabled={product.countInStock === 0}
-                      onClick={addToCartHandler}
-                    >
-                      Add To Cart
-                    </Button>
-                  </ListGroup.Item>
+        .purchase-card .list-group-item {
+          padding: 18px;
+        }
 
-                </ListGroup>
-              </Card>
-            </Col>
-          </Row>
+        .stock-badge {
+          font-size: .85rem;
+          padding: 8px 12px;
+          border-radius: 50px;
+        }
 
-          {/* REVIEWS */}
-          <Row className='mt-4'>
-            <Col md={6}>
-              <h2>Reviews</h2>
+        .buy-btn {
+          width: 100%;
+          border-radius: 12px;
+          font-weight: 700;
+          padding: 12px;
+          font-size: 1rem;
+        }
 
-              {product.reviews.length === 0 && (
-                <Message>No Reviews</Message>
-              )}
+        .reviews-section {
+          margin-top: 60px;
+        }
 
-              <ListGroup variant='flush'>
-                {renderReviews()}
+        .review-title {
+          font-size: 2rem;
+          font-weight: 700;
+          color: #0f172a;
+          margin-bottom: 25px;
+        }
 
-                {/* REVIEW FORM */}
-                <ListGroup.Item>
-                  <h2>Write a Review</h2>
+        .review-card {
+          background: white;
+          border-radius: 20px;
+          padding: 20px;
+          margin-bottom: 15px;
+          box-shadow: 0 8px 20px rgba(0,0,0,.05);
+        }
 
-                  {loadingReview && <Loader />}
+        .review-user {
+          font-weight: 700;
+          color: #111827;
+        }
+
+        .review-date {
+          color: #94a3b8;
+          font-size: .9rem;
+          margin-top: 5px;
+        }
+
+        .review-comment {
+          color: #475569;
+          margin-top: 10px;
+        }
+
+        .review-form-card {
+          background: white;
+          border-radius: 24px;
+          padding: 25px;
+          margin-top: 25px;
+          box-shadow: 0 10px 30px rgba(0,0,0,.06);
+        }
+
+        .form-control,
+        .form-select {
+          border-radius: 12px;
+        }
+
+        @media(max-width: 992px) {
+          .purchase-card {
+            position: relative;
+            top: 0;
+            margin-top: 25px;
+          }
+
+          .product-title {
+            font-size: 1.8rem;
+          }
+        }
+      `}</style>
+
+      <div className="product-page">
+        <Container>
+          <Link to="/" className="btn btn-light back-btn my-4">
+            ← Go Back
+          </Link>
+
+          {isLoading ? (
+            <Loader />
+          ) : error ? (
+            <Message variant="danger">
+              {error?.data?.message || error.error}
+            </Message>
+          ) : (
+            <>
+              <Row className="g-4">
+                {/* IMAGE */}
+                <Col lg={5}>
+                  <div className="image-card">
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fluid
+                      className="product-image"
+                    />
+                  </div>
+                </Col>
+
+                {/* INFO */}
+                <Col lg={4}>
+                  <div className="info-card">
+                    <h1 className="product-title">
+                      {product.name}
+                    </h1>
+
+                    <Rating
+                      value={product.rating}
+                      text={`${product.numReviews} reviews`}
+                    />
+
+                    <div className="price-tag">
+                      ${product.price}
+                    </div>
+
+                    <div className="description">
+                      {product.description}
+                    </div>
+                  </div>
+                </Col>
+
+                {/* PURCHASE */}
+                <Col lg={3}>
+                  <Card className="purchase-card">
+                    <ListGroup variant="flush">
+                      <ListGroup.Item>
+                        <Row>
+                          <Col>Price</Col>
+                          <Col>
+                            <strong>${product.price}</strong>
+                          </Col>
+                        </Row>
+                      </ListGroup.Item>
+
+                      <ListGroup.Item>
+                        <Row>
+                          <Col>Status</Col>
+                          <Col>
+                            {product.countInStock > 0 ? (
+                              <Badge bg="success" className="stock-badge">
+                                In Stock
+                              </Badge>
+                            ) : (
+                              <Badge bg="danger" className="stock-badge">
+                                Out Of Stock
+                              </Badge>
+                            )}
+                          </Col>
+                        </Row>
+                      </ListGroup.Item>
+
+                      {product.countInStock > 0 && (
+                        <ListGroup.Item>
+                          <Row>
+                            <Col>Qty</Col>
+                            <Col>
+                              <Form.Select
+                                value={qty}
+                                onChange={(e) =>
+                                  setQty(Number(e.target.value))
+                                }
+                              >
+                                {[...Array(product.countInStock).keys()].map(
+                                  (x) => (
+                                    <option
+                                      key={x + 1}
+                                      value={x + 1}
+                                    >
+                                      {x + 1}
+                                    </option>
+                                  )
+                                )}
+                              </Form.Select>
+                            </Col>
+                          </Row>
+                        </ListGroup.Item>
+                      )}
+
+                      <ListGroup.Item>
+                        <Button
+                          className="buy-btn"
+                          disabled={product.countInStock === 0}
+                          onClick={addToCartHandler}
+                        >
+                          Add To Cart
+                        </Button>
+                      </ListGroup.Item>
+                    </ListGroup>
+                  </Card>
+                </Col>
+              </Row>
+
+              {/* REVIEWS */}
+              <div className="reviews-section">
+                <h2 className="review-title">
+                  Customer Reviews
+                </h2>
+
+                {product.reviews.length === 0 && (
+                  <Message>No Reviews Yet</Message>
+                )}
+
+                {product.reviews.map((review) => (
+                  <div
+                    key={review._id}
+                    className="review-card"
+                  >
+                    <div className="review-user">
+                      {review.name}
+                    </div>
+
+                    <Rating value={review.rating} />
+
+                    <div className="review-date">
+                      {review.createdAt.substring(0, 10)}
+                    </div>
+
+                    <div className="review-comment">
+                      {review.comment}
+                    </div>
+                  </div>
+                ))}
+
+                <div className="review-form-card">
+                  <h4 className="mb-4">
+                    Write a Customer Review
+                  </h4>
+
+                  {loadingProductReview && <Loader />}
 
                   {userInfo ? (
-                    <Form onSubmit={submitReviewHandler}>
-
-                      <Form.Group className='my-2'>
+                    <Form onSubmit={submitHandler}>
+                      <Form.Group
+                        className="mb-3"
+                        controlId="rating"
+                      >
                         <Form.Label>Rating</Form.Label>
+
                         <Form.Select
-                          value={reviewData.rating}
                           required
+                          value={rating}
                           onChange={(e) =>
-                            setReviewData({
-                              ...reviewData,
-                              rating: Number(e.target.value),
-                            })
+                            setRating(e.target.value)
                           }
                         >
-                          <option value=''>Select...</option>
-                          <option value='1'>1 - Poor</option>
-                          <option value='2'>2 - Fair</option>
-                          <option value='3'>3 - Good</option>
-                          <option value='4'>4 - Very Good</option>
-                          <option value='5'>5 - Excellent</option>
+                          <option value="">
+                            Select...
+                          </option>
+                          <option value="1">
+                            1 - Poor
+                          </option>
+                          <option value="2">
+                            2 - Fair
+                          </option>
+                          <option value="3">
+                            3 - Good
+                          </option>
+                          <option value="4">
+                            4 - Very Good
+                          </option>
+                          <option value="5">
+                            5 - Excellent
+                          </option>
                         </Form.Select>
                       </Form.Group>
 
-                      <Form.Group className='my-2'>
-                        <Form.Label>Comment</Form.Label>
+                      <Form.Group
+                        className="mb-3"
+                        controlId="comment"
+                      >
+                        <Form.Label>
+                          Comment
+                        </Form.Label>
+
                         <Form.Control
-                          as='textarea'
-                          rows={3}
+                          as="textarea"
+                          rows={4}
                           required
-                          value={reviewData.comment}
+                          value={comment}
                           onChange={(e) =>
-                            setReviewData({
-                              ...reviewData,
-                              comment: e.target.value,
-                            })
+                            setComment(e.target.value)
                           }
                         />
                       </Form.Group>
 
                       <Button
-                        type='submit'
-                        disabled={loadingReview}
+                        type="submit"
+                        disabled={loadingProductReview}
                       >
-                        Submit
+                        Submit Review
                       </Button>
                     </Form>
                   ) : (
                     <Message>
-                      Please <Link to='/login'>sign in</Link> to review
+                      Please{' '}
+                      <Link to="/login">
+                        sign in
+                      </Link>{' '}
+                      to write a review
                     </Message>
                   )}
-                </ListGroup.Item>
-
-              </ListGroup>
-            </Col>
-          </Row>
-        </>
-      )}
+                </div>
+              </div>
+            </>
+          )}
+        </Container>
+      </div>
     </>
   );
 };
