@@ -1,7 +1,9 @@
+/* Layout */
 main {
   min-height: 80vh;
 }
 
+/* Rating Component */
 .rating span {
   margin: 0.1rem;
 }
@@ -16,18 +18,21 @@ main {
   padding-left: 0.5rem;
 }
 
+/* Product Card */
 .product-title {
-  height: 2.5em; /* Set a fixed height */
-  overflow: hidden; /* Hide overflow content */
-  text-overflow: ellipsis; /* Add ellipsis for long text */
-  white-space: nowrap; /* Prevent wrapping */
+  height: 2.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+/* Table */
 table td,
 table th {
   text-align: center;
 }
 
+/* Review Section */
 .review {
   margin-top: 30px;
 }
@@ -43,11 +48,12 @@ table th {
   margin-top: 10px;
 }
 
+/* Carousel */
 .carousel-caption {
   position: absolute;
-  width: 100%;
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
+  width: 100%;
   background: rgba(0, 0, 0, 0.5);
 }
