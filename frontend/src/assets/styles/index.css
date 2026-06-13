@@ -1,59 +1,64 @@
-/* Layout */
-main {
-  min-height: 80vh;
+:root {
+  --star-color: #f8e825;
+  --review-bg: #f4f4f4;
+  --review-border: #ddd;
+  --carousel-overlay: rgba(0, 0, 0, 0.5);
 }
 
-/* Rating Component */
-.rating span {
-  margin: 0.1rem;
+
+.carousel-caption {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  background: var(--carousel-overlay);
 }
 
-.rating svg {
-  color: #f8e825;
-}
 
-.rating-text {
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding-left: 0.5rem;
-}
-
-/* Product Card */
-.product-title {
-  height: 2.5em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Table */
-table td,
-table th {
-  text-align: center;
-}
-
-/* Review Section */
 .review {
   margin-top: 30px;
 }
 
 .review h2 {
   font-size: 24px;
-  background: #f4f4f4;
+  background: var(--review-bg);
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--review-border);
 }
 
 .review button {
   margin-top: 10px;
 }
 
-/* Carousel */
-.carousel-caption {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  background: rgba(0, 0, 0, 0.5);
+/* ---------- Tables ---------- */
+table th,
+table td {
+  text-align: center;
+}
+
+/* ---------- Product card ---------- */
+.product-title {
+  height: 2.5em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- Star rating ---------- */
+.rating-text {
+  padding-left: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.rating svg {
+  color: var(--star-color);
+}
+
+.rating span {
+  margin: 0.1rem;
+}
+
+/* ---------- Page layout ---------- */
+main {
+  min-height: 80vh;
 }
