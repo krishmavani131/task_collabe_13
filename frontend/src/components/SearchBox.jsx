@@ -1,44 +1,53 @@
-import { useState } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Form, Button, InputGroup } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const SearchBox = () => {
-  const { keyword: keywordFromUrl } = useParams();
   const navigate = useNavigate();
+  const { keyword: urlKeyword } = useParams();
 
-  // Fallback to empty string since keywordFromUrl may be undefined
-  const [searchTerm, setSearchTerm] = useState(keywordFromUrl || '');
+  const [keyword, setKeyword] = useState(urlKeyword || '');
 
-  const handleChange = (event) => {
-    setSearchTerm(event.target.value);
-  };
+  const submitHandler = (e) => {
+    e.preventDefault();
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    const trimmedTerm = searchTerm.trim();
-
-    if (trimmedTerm) {
-      navigate(`/search/${trimmedTerm}`);
-      setSearchTerm('');
+    if (keyword.trim()) {
+      navigate(`/search/${keyword.trim()}`);
     } else {
       navigate('/');
     }
   };
 
   return (
-    <Form onSubmit={handleSubmit} className='d-flex'>
-      <Form.Control
-        type='text'
-        name='q'
-        value={searchTerm}
-        onChange={handleChange}
-        placeholder='Search Products...'
-        className='mr-sm-2 ml-sm-5'
-      />
-      <Button type='submit' variant='outline-success' className='p-2 mx-2'>
-        Search
-      </Button>
+    <Form
+      onSubmit={submitHandler}
+      className='d-flex align-items-center'
+    >
+      <InputGroup>
+        <Form.Control
+          type='text'
+          name='q'
+          value={keyword}
+          placeholder='Search products...'
+          onChange={(e) => setKeyword(e.target.value)}
+          className='rounded-start-pill shadow-sm border-0'
+          style={{
+            minWidth: '260px',
+            height: '46px',
+          }}
+        />
+
+        <Button
+          type='submit'
+          variant='success'
+          className='rounded-end-pill px-4 fw-semibold shadow-sm'
+          style={{
+            height: '46px',
+          }}
+        >
+          🔍 Search
+        </Button>
+      </InputGroup>
     </Form>
   );
 };

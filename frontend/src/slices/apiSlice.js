@@ -1,25 +1,50 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { BASE_URL } from "../constants";
-import { logout } from "./authSlice";
+import {
+  fetchBaseQuery,
+  createApi,
+} from '@reduxjs/toolkit/query/react';
+
+import { BASE_URL } from '../constants';
+import { logout } from './authSlice';
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,
-  credentials: "include",
+  credentials: 'include',
 });
 
-const baseQueryHandler = async (request, api, extraOptions) => {
-  const response = await baseQuery(request, api, extraOptions);
+const baseQueryWithAuth = async (
+  args,
+  api,
+  extraOptions
+) => {
+  const result = await baseQuery(
+    args,
+    api,
+    extraOptions
+  );
 
-  if (response?.error?.status === 401) {
+  if (
+    result?.error?.status === 401
+  ) {
+    console.warn(
+      'Session expired. Logging out user.'
+    );
+
     api.dispatch(logout());
   }
 
-  return response;
+  return result;
 };
 
 export const apiSlice = createApi({
-  reducerPath: "api",
-  baseQuery: baseQueryHandler,
-  tagTypes: ["Product", "Order", "User"],
+  reducerPath: 'api',
+
+  baseQuery: baseQueryWithAuth,
+
+  tagTypes: [
+    'Product',
+    'Order',
+    'User',
+  ],
+
   endpoints: () => ({}),
 });
