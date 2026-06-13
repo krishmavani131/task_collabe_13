@@ -1,8 +1,13 @@
-const formatPrice = (value) => {
-  return (Math.round(value * 100) / 100).toFixed(2);
+const addDecimals = (num) => {
+  return (Math.round(num * 100) / 100).toFixed(2);
 };
 
-export const calcPrices = (orderItems) => {
+// NOTE: the code below has been changed from the course code to fix an issue
+// with type coercion of strings to numbers.
+// Our addDecimals function expects a number and returns a string, so it is not
+// correct to call it passing a string as the argument.
+
+export function calcPrices(orderItems) {
   const itemsPrice = orderItems.reduce(
     (total, product) => total + (product.price * 100 * product.qty) / 100,
     0
@@ -10,7 +15,8 @@ export const calcPrices = (orderItems) => {
 
   const shippingPrice = itemsPrice > 100 ? 0 : 10;
 
-  const taxPrice = itemsPrice * 0.15;
+  const taxRate = 0.15;
+  const taxPrice = taxRate * itemsPrice;
 
   const totalPrice = itemsPrice + shippingPrice + taxPrice;
 

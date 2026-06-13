@@ -3,7 +3,7 @@ import asyncHandler from './asyncHandler.js';
 import User from '../models/userModel.js';
 
 const protect = asyncHandler(async (req, res, next) => {
-  const { jwt: token } = req.cookies;
+  const token = req.cookies.jwt;
 
   if (!token) {
     res.status(401);
